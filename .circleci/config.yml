@@ -213,7 +213,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
+            yum install -y nodejs
+            yum install python3-pip
+            pip3 install ansible
       - run:
           name: Get backend url
           command: |
