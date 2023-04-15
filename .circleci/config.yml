@@ -146,7 +146,6 @@ jobs:
 
   configure-infrastructure:
     docker:
-      # - image: python:3.7-alpine3.11
       - image: python:3.9.16
     steps:
       - checkout
@@ -157,7 +156,6 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # apk add --update ansible 
             apt-get update -y
             apt install ansible -y
             which ansible
@@ -176,6 +174,11 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
+          name: Install awscli
+          command: |
+              sudo apt-get update -y
+              sudo apt-get install awscli -y
+      - run:
           name: Run migrations
           command: |
             cd backend
@@ -189,6 +192,10 @@ jobs:
             then
               curl https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
+      - destroy-environment:
+          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
   deploy-frontend:
     docker:
@@ -239,7 +246,7 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
       - deploy-frontend:
-          requires: [run-migrations]
+          requires: [configure-infrastructure]
