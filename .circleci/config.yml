@@ -134,6 +134,8 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            echo "${BACKEND_IP}"
             aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text > ~/inventory.txt
       - persist_to_workspace:
           root: ~/
@@ -163,10 +165,6 @@ jobs:
           command: |
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment:
-          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
   
   run-migrations:
     docker:
@@ -189,10 +187,6 @@ jobs:
             then
               curl https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
-      - destroy-environment:
-          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
   deploy-frontend:
     docker:
