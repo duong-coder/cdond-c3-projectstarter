@@ -156,6 +156,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            pip3 install awscli
             apt-get update -y
             apt install ansible -y
             which ansible
@@ -165,6 +166,10 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment:
+          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
   
   run-migrations:
     docker:
@@ -202,6 +207,7 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - run: yum install -y tar gzip
       - attach_workspace:
           at: ~/
       - run:
