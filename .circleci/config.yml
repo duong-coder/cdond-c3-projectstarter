@@ -144,6 +144,26 @@ jobs:
       - destroy-environment:
           stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["7c:61:18:2b:a0:88:f0:31:1e:39:f5:54:16:ea:03:24"] 
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            yum install -y tar gzip
+            apk add --update ansible 
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+
 workflows:
   default:
     jobs:
@@ -162,3 +182,5 @@ workflows:
           filters:
             branches:
               only: [test-feature-branch]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
