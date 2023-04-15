@@ -207,9 +207,16 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run: yum install -y tar gzip
+      - run: yum install -y tar gzip python3
       - attach_workspace:
           at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
+            yum install -y nodejs
+            yum install python3-pip
+            pip3 install ansible
       - run:
           name: Get backend url
           command: |
