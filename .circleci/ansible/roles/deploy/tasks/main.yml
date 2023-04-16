@@ -24,17 +24,17 @@
     path: ~/backend-app
     state: directory
 
-- name: extract artifact 1
-  become: true
-  unarchive:
-    src: artifact.tar.gz
-    dest: ~/backend-app
-
-# - name: extract artifact 2
+# - name: extract artifact 1
 #   become: true
 #   unarchive:
-#     src: files/artifact.tar.gz
+#     src: artifact.tar.gz
 #     dest: ~/backend-app
+
+- name: extract artifact 2
+  become: true
+  unarchive:
+    src: files/artifact.tar.gz
+    dest: ~/backend-app
 
 # - name: extract artifact 3
 #   become: true
