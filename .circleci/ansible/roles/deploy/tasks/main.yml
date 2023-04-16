@@ -19,11 +19,6 @@
     production: yes
     state: present
 
-- name: "Install tar"
-  apt:
-    name: tar
-    state: present
-
 - name: extract artifact
   become: true
   unarchive:
