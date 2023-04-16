@@ -178,8 +178,8 @@ jobs:
       - run:
           name: Install awscli
           command: |
-              sudo apt-get update -y
-              sudo apt-get install awscli -y
+            apt-get update -y
+            apt-get install awscli -y
       - run:
           name: Run migrations
           command: |
@@ -244,7 +244,7 @@ jobs:
             pip3 install awscli
             apt-get update -y
             apt install -y tar gzip
-            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
+            curl -sL https://rpm.nodesource.com/setup_13.x | bash -
             apt install -y nodejs
             apt install ansible -y
       - restore_cache:
