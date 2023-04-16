@@ -25,13 +25,13 @@
     src: files/artifact.tar.gz 
     dest: .
 
-- name: "npm version"
-  shell: npm -version
+# - name: "npm version"
+#   shell: npm -version
 
 - name: Executing node
   become: true
   shell: |
-    # npm install
-    # pm2 stop default
-    pm2 delete all
+    npm install
+    pm2 stop default
+    # pm2 delete all
     pm2 start npm -- start
