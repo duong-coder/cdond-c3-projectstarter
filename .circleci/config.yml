@@ -241,13 +241,12 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add curl
-            apk add --update npm
-            apk add --update nodejs
-            apk add --update ansible
-            apk add tar
-            apk add gzip
             pip3 install awscli
+            apt-get update -y
+            apt install -y tar gzip
+            apt install ansible -y
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            apt install -y nodejs
       - restore_cache:
           keys: [backend-build]
       - run:
