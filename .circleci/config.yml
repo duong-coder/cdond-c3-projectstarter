@@ -303,6 +303,7 @@ jobs:
             else
               return 1
             fi
+      - destroy-environment
 
 workflows:
   default:
