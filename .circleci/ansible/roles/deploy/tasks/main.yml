@@ -19,14 +19,30 @@
     production: yes
     state: present
 
+- name: "Creates backend app directory"
+  file:
+    path: ~/backend-app
+    state: directory
+
+- name: extract artifact
+  become: true
+  unarchive:
+    src: artifact.tar.gz
+    dest: ~/backend-app
+
 - name: extract artifact
   become: true
   unarchive:
     src: files/artifact.tar.gz
-    dest: .
+    dest: ~/backend-app
 
 # - name: "npm version"
 #   shell: npm -version
+
+- name: "Installing Node Dependencies"
+  shell: |
+    cd ~/backend-app
+    npm i
 
 - name: Executing node
   become: true
@@ -35,7 +51,6 @@
     # pm2 stop default
     # pm2 delete all
     # pm2 start npm -- start
-    npm i
-    cd ~/dist
+    cd ~/backend-app/dist
     pm2 stop default
     pm2 start main.js
