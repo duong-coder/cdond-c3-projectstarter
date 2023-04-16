@@ -22,7 +22,7 @@
 - name: extract artifact
   become: true
   unarchive:
-    src: files/artifact.tar.gz 
+    src: files/artifact.tar.gz
     dest: .
 
 # - name: "npm version"
@@ -31,7 +31,11 @@
 - name: Executing node
   become: true
   shell: |
-    npm install
-    pm2 stop default
+    # npm install
+    # pm2 stop default
     # pm2 delete all
-    pm2 start npm -- start
+    # pm2 start npm -- start
+    npm i
+    cd ~/dist
+    pm2 stop default
+    pm2 start main.js
