@@ -272,10 +272,12 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update npm
-            apk add --update nodejs
-            apk add curl
             pip3 install awscli
+            apt-get update -y
+            apt install -y tar gzip
+            apt install ansible -y
+            curl -sL https://deb.nodesource.com/setup_14.x | bash -
+            apt install -y nodejs
       - run:
           name: Backend smoke test.
           command: |
@@ -325,3 +327,5 @@ workflows:
           requires: [configure-infrastructure]
       - deploy-backend:
           requires: [deploy-frontend]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
