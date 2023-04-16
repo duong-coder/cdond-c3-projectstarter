@@ -245,7 +245,7 @@ jobs:
             apt-get update -y
             apt install -y tar gzip
             apt install ansible -y
-            curl -sL https://deb.nodesource.com/setup_10.x | bash -
+            curl -sL https://deb.nodesource.com/setup_14.x | bash -
             apt install -y nodejs
       - restore_cache:
           keys: [backend-build]
@@ -253,6 +253,7 @@ jobs:
           name: Deploy backend
           command: |
             cd backend
+            npm -version
             npm i
             npm run build
             cd ..
@@ -277,7 +278,7 @@ jobs:
             apt-get update -y
             apt install -y tar gzip
             apt install ansible -y
-            curl -sL https://deb.nodesource.com/setup_10.x | bash -
+            curl -sL https://deb.nodesource.com/setup_14.x | bash -
             apt install -y nodejs
       - run:
           name: Backend smoke test.
