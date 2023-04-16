@@ -241,12 +241,13 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            apk add curl
+            apk add --update npm
+            apk add --update nodejs
+            apk add --update ansible
+            apk add tar
+            apk add gzip
             pip3 install awscli
-            apt-get update -y
-            apt install -y tar gzip
-            curl -sL https://rpm.nodesource.com/setup_13.x | bash -
-            apt install -y nodejs
-            apt install ansible -y
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -262,6 +263,44 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment
+
+  smoke-test:
+    docker:
+      - image: python:3.9.16
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update npm
+            apk add --update nodejs
+            apk add curl
+            pip3 install awscli
+      - run:
+          name: Backend smoke test.
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+              return 0
+            else
+              return 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              # Change this to 0 after the job fails
+              return 1
+            else
+              return 1
+            fi
       - destroy-environment
 
 workflows:
@@ -286,4 +325,4 @@ workflows:
       - deploy-frontend:
           requires: [configure-infrastructure]
       - deploy-backend:
-          requires: [configure-infrastructure]
+          requires: [deploy-frontend]
