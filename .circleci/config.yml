@@ -7,14 +7,17 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      stackname: 
+      Workflow_ID:
         type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name << parameters.stackname >>
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
+            aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
 
 jobs:
   build-frontend:
@@ -139,10 +142,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment:
-          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment
 
   configure-infrastructure:
     docker:
@@ -166,10 +166,7 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment:
-          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment
   
   run-migrations:
     docker:
@@ -197,10 +194,7 @@ jobs:
             then
               curl https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
-      - destroy-environment:
-          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment
 
   deploy-frontend:
     docker:
@@ -233,10 +227,7 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment:
-          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment
 
   deploy-backend:
     docker:
@@ -250,13 +241,12 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add curl
-            apk add --update npm
-            apk add --update nodejs
-            apk add --update ansible
-            apk add tar
-            apk add gzip
             pip3 install awscli
+            yum install -y tar gzip
+            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
+            yum install -y nodejs
+            apt-get update -y
+            apt install ansible -y
       - run:
           name: Deploy backend
           command: |
@@ -270,10 +260,7 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy-environment:
-          stackname: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          stackname: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment
 
 workflows:
   default:
