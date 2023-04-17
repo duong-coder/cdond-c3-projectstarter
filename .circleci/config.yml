@@ -281,7 +281,6 @@ jobs:
             cd backend
             npm -version
             npm i
-            npm start
             npm run build
             cd ..
             # Zip the directory
