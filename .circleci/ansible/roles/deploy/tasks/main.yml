@@ -19,55 +19,11 @@
     production: yes
     state: present
 
-- name: "Creates backend app directory"
-  file:
-    path: ~/backend-app
-    state: directory
-
-# - name: extract artifact 1
-#   become: true
-#   unarchive:
-#     src: artifact.tar.gz
-#     dest: ~/backend-app
-
-# - name: extract artifact 2
-#   become: true
-#   unarchive:
-#     src: files/artifact.tar.gz
-#     dest: ~/backend-app
-
-# - name: extract artifact 3
-#   become: true
-#   unarchive:
-#     src: artifact.tar.gz
-#     dest: .
-
 - name: extract artifact 4
   become: true
   unarchive:
     src: files/artifact.tar.gz
     dest: .
-
-# - name: "npm version"
-#   shell: npm -version
-
-# - name: "Installing Node Dependencies"
-#   shell: |
-#     cd ~/backend-app
-#     npm i
-
-# - name: Executing node
-#   become: true
-#   shell: |
-#     cd ~/backend-app/dist
-#     pm2 stop default
-#     pm2 start main.js
-#   register: execute_node
-
-# - name: "Configure pm2 to start as service"
-#   become: true
-#   shell: |
-#     env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
 
 - name: Executing node 2
   become: true
@@ -75,13 +31,23 @@
     npm install
     pm2 stop default
     pm2 start npm -- start
+  environment:
+    ENVIRONMENT: production
+    TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
+    TYPEORM_MIGRATIONS_DIR: "./migrations"
+    TYPEORM_MIGRATIONS: "./migrations/*.js"
+    TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
+    TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+    TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+    TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+    TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+    TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
   register: execute_node
-
-# - name: Executing node 3
-#   become: true
-#   shell: |
-#     pm2 delete all
-#     pm2 start npm -- start
+  
+- name: "Set pm2 start as service"
+  become: yes
+  shell: |
+    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
 
 - name: print message
   debug:
