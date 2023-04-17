@@ -47,7 +47,7 @@
 - name: "Set pm2 start as service"
   become: yes
   shell: |
-    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
+    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu --hp /home/ubuntu
 
 - name: print message
   debug:
