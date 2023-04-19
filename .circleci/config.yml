@@ -253,8 +253,6 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            echo ENVIRONMENT=production > backend/.env
-            echo NODE_ENV=production > backend/.env
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> backend/.env
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
             echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> backend/.env
@@ -340,7 +338,8 @@ workflows:
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
-      #     requires: [run-migrations]
+      #     requires: [configure-infrastructure]
+          # requires: [run-migrations]
       - deploy-backend:
           requires: [configure-infrastructure]
           # requires: [run-migrations]
