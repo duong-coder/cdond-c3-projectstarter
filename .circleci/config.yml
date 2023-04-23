@@ -231,11 +231,11 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            exit 1
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs
             yum install python3-pip
             pip3 install ansible
-            exit 1
       - run:
           name: Get backend url
           command: |
